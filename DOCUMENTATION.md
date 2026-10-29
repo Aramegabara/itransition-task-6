@@ -113,17 +113,20 @@ always returns the same rows. `row_no` is continuous across pages:
 
 ## Benchmark
 
-Measured locally, best of three runs:
+Measured against the deployed PostgreSQL instance (Render, Frankfurt, free
+tier) from a client outside the datacenter, best of three runs:
 
 | users | seconds | users/sec |
 |---|---|---|
-| 1 000 | 0.00 | 458 803 |
-| 10 000 | 0.01 | 1 889 779 |
-| 50 000 | 0.01 | 3 830 867 |
-| 100 000 | 0.03 | 2 881 449 |
+| 1 000 | 0.08 | 12 640 |
+| 10 000 | 0.09 | 116 818 |
+| 50 000 | 0.27 | 182 698 |
+| 100 000 | 0.51 | 197 583 |
 
-Small batches are dominated by connection overhead; throughput settles
-around **three million users per second**.
+Small batches are dominated by the round trip to the database, so throughput
+rises with batch size and settles around **200 000 users per second**. At
+100 000 rows the figure is bound by transferring the result set over the
+network rather than by the generation itself.
 
 Reproduce with `DATABASE_URL=... python benchmark.py`.
 

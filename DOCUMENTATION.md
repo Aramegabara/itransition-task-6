@@ -61,16 +61,25 @@ True with probability `p`. Used for optional parts such as a title.
 ### `rnd_normal(key, mean, sd) -> double precision`
 Normal distribution via the **Box–Muller transform**: two independent
 uniforms `u1`, `u2` give `mean + sd · √(−2 ln u1) · cos(2π u2)`.
-Measured over 50 000 users: mean 172.02 and sd 8.97 against the requested
-172 and 9.
+Height is requested as mean 172 sd 9 and weight as mean 75 sd 13. Measured
+over 50 000 users per locale:
+
+| locale | height mean | height sd | weight mean | weight sd |
+|---|---|---|---|---|
+| en_US | 172.01 | 9.02 | 74.97 | 13.07 |
+| de_DE | 171.96 | 9.00 | 74.94 | 12.95 |
 
 ### `rnd_lat(key)`, `rnd_lon(key)`
 A point distributed **uniformly over the sphere**, which is not the same as
 two uniform angles: a band of latitude near the equator covers more surface
 than one of the same width near a pole, so uniform latitude would crowd the
 poles. Longitude is uniform in `[−180, 180)`, latitude is
-`asin(2u − 1)` in degrees. Measured: 13.14 % of points above 60° latitude
-against the theoretical 13.40 %.
+`asin(2u − 1)` in degrees.
+
+The share of a sphere above 60° of latitude is `(1 − sin 60°) / 2`, which is
+6.70 % per pole and 13.40 % for both. Measured over 50 000 users: 13.73 %
+for en_US and 13.37 % for de_DE. Two uniform angles would instead put about
+33 % of the points there.
 
 ### `rnd_pick(locale, kind, key) -> text`
 One dictionary value: `idx = floor(rnd(key) · n)`, then a primary-key lookup.
@@ -129,6 +138,11 @@ rises with batch size and settles around **200 000 users per second**. At
 network rather than by the generation itself.
 
 Reproduce with `DATABASE_URL=... python benchmark.py`.
+
+Every measured figure elsewhere in this document — dictionary sizes, the
+number of combinations, the height and weight distributions and the share of
+points above 60° of latitude — is reproduced by
+`DATABASE_URL=... python verify.py`.
 
 ## Install
 
